@@ -14,18 +14,25 @@ set(
   Widgets
 )
 
+# find Qt6 or Qt5
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
+set(QT_VERSION_MAJOR ${QT_VERSION_MAJOR} PARENT_SCOPE) # make it available elsewhere
+if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+  set(REQUIRED_QT_VERSION 6.0) # need to raise required version when running find_package on Qt6
+endif()
+
 set (QT_COLLIDER_LIBS
-  Qt5::Core Qt5::Gui Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets
+  Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::PrintSupport Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::Widgets
   ${MATH_LIBRARY})
 
 if(SC_USE_QTWEBENGINE)
-  list(APPEND QT_COMPONENTS WebEngine WebEngineCore WebEngineWidgets)
-  list(APPEND QT_COLLIDER_LIBS Qt5::WebEngineCore Qt5::WebEngineWidgets)
+  list(APPEND QT_COMPONENTS WebEngineCore WebEngineWidgets)
+  list(APPEND QT_COLLIDER_LIBS Qt${QT_VERSION_MAJOR}::WebEngineCore Qt${QT_VERSION_MAJOR}::WebEngineWidgets)
 endif()
 
-find_package(Qt5 ${REQUIRED_QT_VERSION} COMPONENTS ${QT_COMPONENTS} REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} ${REQUIRED_QT_VERSION} COMPONENTS ${QT_COMPONENTS} REQUIRED)
 
-if (APPLE)
+if (APPLE AND ${QT_VERSION_MAJOR} LESS 6)
   find_package(Qt5MacExtras)
   mark_as_advanced(Qt5MacExtras_DIR)
   list(APPEND QT_COLLIDER_LIBS Qt5::MacExtras)
@@ -153,18 +160,30 @@ endif()
 
 ###############################################################################
 
-qt5_wrap_cpp( QT_COLLIDER_MOC_SRCS ${QT_COLLIDER_HDRS} )
-qt5_add_resources( QT_COLLIDER_RCC ${QT_COLLIDER_DIR}/resources.qrc )
+if (${QT_VERSION_MAJOR} LESS 6)
+  qt5_wrap_cpp( QT_COLLIDER_MOC_SRCS ${QT_COLLIDER_HDRS} )
+  qt5_add_resources( QT_COLLIDER_RCC ${QT_COLLIDER_DIR}/resources.qrc )
+else()
+  qt_wrap_cpp( QT_COLLIDER_MOC_SRCS ${QT_COLLIDER_HDRS} )
+  qt_add_resources( QT_COLLIDER_RCC ${QT_COLLIDER_DIR}/resources.qrc )
+endif()
 
 if(APPLE)
-	qt5_wrap_cpp( QT_COLLIDER_OBJ_MOC_SRCS ${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.h )
-	list(APPEND QT_COLLIDER_HDRS ${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.h )
-  	set( QT_COLLIDER_OBJCPP_SRCS
-  		${QT_COLLIDER_OBJ_MOC_SRCS}
-		${QT_COLLIDER_DIR}/hacks/hacks_mac.mm
-		${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.mm
-		${QT_COLLIDER_DIR}/primitives/prim_QQuartzComposer.mm
-  	)
+  if(${QT_VERSION_MAJOR} LESS 6)
+    qt5_wrap_cpp( QT_COLLIDER_OBJ_MOC_SRCS ${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.h )
+    list(APPEND QT_COLLIDER_HDRS ${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.h )
+      set( QT_COLLIDER_OBJCPP_SRCS
+        ${QT_COLLIDER_OBJ_MOC_SRCS}
+      ${QT_COLLIDER_DIR}/hacks/hacks_mac.mm
+      ${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.mm
+      ${QT_COLLIDER_DIR}/primitives/prim_QQuartzComposer.mm
+      )
+  else()
+    set( QT_COLLIDER_OBJCPP_SRCS
+      ${QT_COLLIDER_OBJ_MOC_SRCS}
+      ${QT_COLLIDER_DIR}/hacks/hacks_mac.mm
+    )
+  endif()
 endif()
 
 set_source_files_properties( ${QT_COLLIDER_OBJCPP_SRCS}

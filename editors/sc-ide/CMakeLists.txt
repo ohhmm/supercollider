@@ -7,32 +7,26 @@ set(QT_IDE_COMPONENTS
 )
 
 set(QT_IDE_LIBRARIES
-    Qt5::Concurrent
-    Qt5::Core
-    Qt5::Network
-    Qt5::Widgets
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Widgets
 )
 
 if(SC_USE_QTWEBENGINE)
     list(APPEND QT_IDE_COMPONENTS
         WebChannel
-        WebEngine
         WebEngineWidgets
         WebSockets
     )
     list(APPEND QT_IDE_LIBRARIES
-        Qt5::WebChannel
-        Qt5::WebEngineWidgets
-        Qt5::WebSockets
+        Qt${QT_VERSION_MAJOR}::WebChannel
+        Qt${QT_VERSION_MAJOR}::WebEngineWidgets
+        Qt${QT_VERSION_MAJOR}::WebSockets
     )
 endif()
 
-find_package(
-    Qt5 ${REQUIRED_QT_VERSION}
-    COMPONENTS
-    ${QT_IDE_COMPONENTS}
-    REQUIRED
-)
+find_package(Qt${QT_VERSION_MAJOR} ${REQUIRED_QT_VERSION} COMPONENTS ${QT_IDE_COMPONENTS} REQUIRED)
 
 if(${CMAKE_COMPILER_IS_GNUCXX})
     add_definitions(-Wreorder)
@@ -262,10 +256,17 @@ add_custom_target( update_ide_translations
             -no-obsolete -pluralonly
 )
 
-qt5_wrap_cpp( ide_moc_src ${ide_moc_hdr} )
-qt5_wrap_ui( ide_forms_src ${ide_forms} )
-qt5_add_resources( ide_rcc resources.qrc )
-qt5_add_translation( translations ${translation_src} ${native_translation_src} )
+if(${QT_VERSION_MAJOR} LESS 6)
+    qt5_wrap_cpp( ide_moc_src ${ide_moc_hdr} )
+    qt5_wrap_ui( ide_forms_src ${ide_forms} )
+    qt5_add_resources( ide_rcc resources.qrc )
+    qt5_add_translation( translations ${translation_src} ${native_translation_src} )
+else()
+    qt_wrap_cpp( ide_moc_src ${ide_moc_hdr} )
+    qt_wrap_ui( ide_forms_src ${ide_forms} )
+    qt_add_resources( ide_rcc resources.qrc )
+    # qt_add_translation( translations ${translation_src} ${native_translation_src} ) # TODO: update for Qt6
+endif()
 
 set(ide_sources ${ide_src} ${all_hdr} )
 
@@ -511,7 +512,7 @@ if(APPLE OR WIN32)
             endif()
         endif()
 
-        if(SC_USE_QTWEBENGINE AND ${Qt5_VERSION} VERSION_EQUAL 5.15.1)
+        if(SC_USE_QTWEBENGINE AND "${Qt5_VERSION}" VERSION_EQUAL 5.15.1)
             # QTBUG-86759 / #5175 -- macdeployqt fails to copy part of QtWebEngineCore that contains QtWebEngineProcess.app.
             message(STATUS "macdeployqt: will fix deploying QtWebEngineProcess.app for Qt 5.15.1")
 
