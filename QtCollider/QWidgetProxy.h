@@ -41,7 +41,11 @@ public:
 
 public:
     static void setGlobalEventEnabled(GlobalEvent ev, bool b) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+        int mask = _globalEventMask.load();
+#else
         int mask = _globalEventMask.loadRelaxed();
+#endif
         if (b)
             mask |= ev;
         else

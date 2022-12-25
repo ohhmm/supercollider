@@ -259,7 +259,11 @@ void QWidgetProxy::performDrag() {
 bool QWidgetProxy::preProcessEvent(QObject* o, QEvent* e, EventHandlerData& eh, QList<QVariant>& args) {
     // NOTE We assume that qObject need not be checked here, as we wouldn't get events if
     // it wasn't existing
+#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+    int acquired_globalEventMask = _globalEventMask.load();
+#else
     int acquired_globalEventMask = _globalEventMask.loadRelaxed();
+#endif
 
     switch (eh.type) {
     case QEvent::KeyPress:

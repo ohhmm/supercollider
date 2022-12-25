@@ -47,6 +47,15 @@ public:
 
     ~SafePtr() { deref(); }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+    T* operator->() const { return d->ptr.load(); }
+
+    T& operator*() const { return *d->ptr.load(); }
+
+    operator T*() const { return (d ? d->ptr.load() : 0); }
+
+    T* ptr() const { return (d ? d->ptr.load() : 0); }
+#else
     T* operator->() const { return d->ptr.loadRelaxed(); }
 
     T& operator*() const { return *d->ptr.loadRelaxed(); }
@@ -54,6 +63,8 @@ public:
     operator T*() const { return (d ? d->ptr.loadRelaxed() : 0); }
 
     T* ptr() const { return (d ? d->ptr.loadRelaxed() : 0); }
+#endif
+
 
     void* id() const { return (void*)d; } // useful for checking internal pointer identity
 
@@ -73,13 +84,22 @@ private:
     void ref() {
         if (d) {
             d->refCount.ref();
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+            qcDebugMsg(2, QString("SafePtr: +refcount = %1").arg(d->refCount.load()));
+#else
             qcDebugMsg(2, QString("SafePtr: +refcount = %1").arg(d->refCount.loadRelaxed()));
+#endif
         }
     }
     void deref() {
         if (d) {
             bool ref = d->refCount.deref();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+            qcDebugMsg(2, QString("SafePtr: -refcount = %1").arg(d->refCount.load()));
+#else
             qcDebugMsg(2, QString("SafePtr: -refcount = %1").arg(d->refCount.loadRelaxed()));
+#endif
             if (!ref) {
                 qcDebugMsg(2, "SafePtr: unreferenced!");
                 delete d;

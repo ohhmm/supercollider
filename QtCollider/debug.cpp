@@ -29,7 +29,11 @@ static QAtomicInt& debugLevelInt() {
 }
 
 int QtCollider::debugLevel() {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+    int l = debugLevelInt().load();
+#else
     int l = debugLevelInt().loadRelaxed();
+#endif
     return l;
 }
 
