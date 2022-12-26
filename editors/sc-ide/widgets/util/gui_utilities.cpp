@@ -22,13 +22,23 @@
 
 #include <QWidget>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QApplication>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+#    include <QDesktopWidget>
+#else
+#    include <QScreen>
+#    include <QWindow>
+#endif
 
 namespace ScIDE {
 
 QRect fittedToScreen(const QRect& rect, QWidget* referenceWidget) {
     QRect fittedRect = rect;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QRect screen = QApplication::desktop()->availableGeometry(referenceWidget);
+#else
+    QRect screen = referenceWidget->screen()->availableGeometry();
+#endif
     if (!screen.contains(fittedRect)) {
         if (fittedRect.right() > screen.right())
             fittedRect.moveRight(screen.right());

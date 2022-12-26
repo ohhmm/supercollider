@@ -26,7 +26,13 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QKeyEvent>
-#include <QDesktopWidget>
+#include <QApplication>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+#    include <QDesktopWidget>
+#else
+#    include <QScreen>
+#    include <QWindow>
+#endif
 #include <QApplication>
 #include <QPainter>
 #include <QFileInfo>
@@ -74,7 +80,12 @@ GenericLookupDialog::GenericLookupDialog(QWidget* parent): QDialog(parent) {
         QRect parentRect = parent->rect();
         bounds.moveCenter(parent->mapToGlobal(parentRect.center()));
     } else {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         QRect availableBounds = QApplication::desktop()->availableGeometry(this);
+#else
+        QRect availableBounds = this->screen()->availableGeometry();
+#endif
+
         bounds.moveCenter(availableBounds.center());
     }
 
