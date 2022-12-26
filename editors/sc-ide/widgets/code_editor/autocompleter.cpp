@@ -712,9 +712,17 @@ void AutoCompleter::updateCompletionMenu(bool forceShow) {
     if (!mCompletion.text.isEmpty()) {
         QString pattern = mCompletion.text;
         pattern.prepend("^");
+#if (QT_VERSION < QT_VERSION_CHECK(5, 12, 0))
         menu->model()->setFilterRegExp(pattern);
+#else
+        menu->model()->setFilterRegularExpression(pattern);
+#endif
     } else
+#if (QT_VERSION < QT_VERSION_CHECK(5, 12, 0))
         menu->model()->setFilterRegExp(QString());
+#else
+        menu->model()->setFilterRegularExpression(QString());
+#endif
 
     if (menu->model()->hasChildren()) {
         menu->view()->setCurrentIndex(menu->model()->index(0, 0));
