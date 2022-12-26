@@ -28,7 +28,7 @@ endif()
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     list(APPEND QT_IDE_COMPONENTS Core5Compat)
-    list(APPEND QT_IDE_LIBRARIES Qt${QT_VERSION_MAJOR}::Core5Compat)
+    list(APPEND QT_IDE_LIBRARIES Qt${QT_VERSION_MAJOR}::Core5Compat Qt${QT_VERSION_MAJOR}::DBus)
 endif()
 
 find_package(Qt${QT_VERSION_MAJOR} ${REQUIRED_QT_VERSION} COMPONENTS ${QT_IDE_COMPONENTS} REQUIRED)
@@ -485,22 +485,29 @@ if(APPLE OR WIN32)
         # to get QtWebEngine, libsndfile, and other libs. also force scanning of QtWebEngineProcess
         # because macdeployqt is a fickle beast.
         set(CONTENTS_DIR ${CMAKE_INSTALL_PREFIX}/SuperCollider/SuperCollider.app/Contents)
-        set(QT_WEBENGINE_APP
-            "${CONTENTS_DIR}/Frameworks/QtWebEngineCore.framework/Versions/5/Helpers/QtWebEngineProcess.app")
-        set(QT_WEBENGINE_PROCESS "${QT_WEBENGINE_APP}/Contents/MacOS/QtWebEngineProcess")
+        get_target_property(QtCore_location Qt${QT_VERSION_MAJOR}::Core LOCATION)
         set(DEPLOY_CMD "\"${DEPLOY_PROG}\"
                 \"${CMAKE_INSTALL_PREFIX}/SuperCollider/SuperCollider.app\"
                 -verbose=1
                 -executable=${CONTENTS_DIR}/MacOS/sclang
                 -executable=${CONTENTS_DIR}/Resources/scsynth
-                -executable=${CONTENTS_DIR}/Resources/supernova
                 -executable=${CONTENTS_DIR}/Resources/plugins/DiskIO_UGens.scx
-                -executable=${CONTENTS_DIR}/Resources/plugins/DiskIO_UGens_supernova.scx
+            ")
+        if(SC_USE_QTWEBENGINE)
+            set(QT_WEBENGINE_APP
+            "${CONTENTS_DIR}/Frameworks/QtWebEngineCore.framework/Versions/5/Helpers/QtWebEngineProcess.app")
+            set(QT_WEBENGINE_PROCESS "${QT_WEBENGINE_APP}/Contents/MacOS/QtWebEngineProcess")
+            string(APPEND DEPLOY_CMD "
                 -executable=${QT_WEBENGINE_PROCESS}
             ")
+        endif()
         set(VERIFY_CMD "include(BundleUtilities)")
         if(SUPERNOVA)
             get_target_property(LINK_FFTW libsupernova SUPERNOVA_FFTW)
+            string(APPEND DEPLOY_CMD "
+                -executable=${CONTENTS_DIR}/Resources/supernova
+                -executable=${CONTENTS_DIR}/Resources/plugins/DiskIO_UGens_supernova.scx
+            ")
             if(LINK_FFTW)
                 message(STATUS "macdeployqt: will fix linking FFTW for supernova")
                 # For supernova, libfftw3f.3.dylib has a further dependency (libgcc_s) which is copied in,
