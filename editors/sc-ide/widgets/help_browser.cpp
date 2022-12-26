@@ -33,13 +33,22 @@
 #    include <QVBoxLayout>
 #    include <QToolBar>
 #    include <QWebEngineSettings>
-#    include <QWebEngineContextMenuData>
+#    if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
+#        include <QWebEngineContextMenuData>
+#    else
+#        include <QWebEngineContextMenuRequest>
+#    endif
 #    include <QAction>
 #    include <QMenu>
 #    include <QStyle>
 #    include <QShortcut>
 #    include <QApplication>
-#    include <QDesktopWidget>
+#    if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+#        include <QDesktopWidget>
+#    else
+#        include <QScreen>
+#        include <QWindow>
+#    endif
 #    include <QDebug>
 #    include <QKeyEvent>
 
@@ -50,7 +59,11 @@
 namespace ScIDE {
 
 HelpBrowser::HelpBrowser(QWidget* parent): QWidget(parent) {
+#    if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QRect availableScreenRect = qApp->desktop()->availableGeometry(this);
+#    else
+    QRect availableScreenRect = parent->screen()->availableGeometry();
+#    endif
     mSizeHint = QSize(availableScreenRect.width() * 0.4, availableScreenRect.height() * 0.7);
 
     // setPage does not take ownership of webPage; it must be deleted manually later (see below)
@@ -355,6 +368,7 @@ void HelpBrowser::onJsConsoleMsg(const QString& arg1, int arg2, const QString& a
 void HelpBrowser::onContextMenuRequest(const QPoint& pos) {
     QMenu menu;
 
+#    if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
     const auto& contextData = mWebView->page()->contextMenuData();
 
     if (!contextData.linkUrl().isEmpty()) {
@@ -368,6 +382,22 @@ void HelpBrowser::onContextMenuRequest(const QPoint& pos) {
             menu.addAction(mWebView->pageAction(QWebEnginePage::Paste));
         menu.addSeparator();
     }
+
+#    else
+    const auto& contextData = mWebView->lastContextMenuRequest();
+
+    if (!contextData->linkUrl().isEmpty()) {
+        menu.addAction(mWebView->pageAction(QWebEnginePage::CopyLinkToClipboard));
+        menu.addSeparator();
+    }
+
+    if (contextData->isContentEditable() || !contextData->selectedText().isEmpty()) {
+        menu.addAction(mWebView->pageAction(QWebEnginePage::Copy));
+        if (contextData.isContentEditable())
+            menu.addAction(mWebView->pageAction(QWebEnginePage::Paste));
+        menu.addSeparator();
+    }
+#    endif
 
     menu.addAction(mWebView->pageAction(QWebEnginePage::Back));
     menu.addAction(mWebView->pageAction(QWebEnginePage::Forward));
