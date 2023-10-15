@@ -1,4 +1,4 @@
-set(REQUIRED_QT_VERSION 5.7)
+set(REQUIRED_QT_VERSION 6.2)
 option(SC_USE_QTWEBENGINE "Build with Qt WebEngine." ON)
 
 ###############################################################################
@@ -14,13 +14,6 @@ set(
   Widgets
 )
 
-# find Qt6 or Qt5
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-set(QT_VERSION_MAJOR ${QT_VERSION_MAJOR} PARENT_SCOPE) # make it available elsewhere
-if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  set(REQUIRED_QT_VERSION 6.0) # need to raise required version when running find_package on Qt6
-endif()
-
 set (QT_COLLIDER_LIBS
   Qt::Core Qt::Gui Qt::Network Qt::PrintSupport Qt::Svg Qt::Widgets
   ${MATH_LIBRARY})
@@ -30,21 +23,15 @@ if(SC_USE_QTWEBENGINE)
   list(APPEND QT_COLLIDER_LIBS Qt::WebEngineCore Qt::WebEngineWidgets)
 endif()
 
-if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    list(APPEND QT_COMPONENTS Core5Compat)
-    list(APPEND QT_COLLIDER_LIBS Qt::Core5Compat)
-    if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-        list(APPEND QT_COLLIDER_LIBS Qt::DBus)
-    endif()
+list(APPEND QT_COMPONENTS Core5Compat)
+list(APPEND QT_COLLIDER_LIBS Qt::Core5Compat)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    list(APPEND QT_COLLIDER_LIBS Qt::DBus)
 endif()
 
-find_package(Qt${QT_VERSION_MAJOR} ${REQUIRED_QT_VERSION} COMPONENTS ${QT_COMPONENTS} REQUIRED)
+find_package(Qt6 ${REQUIRED_QT_VERSION} COMPONENTS ${QT_COMPONENTS} REQUIRED)
 
-if (APPLE AND ${QT_VERSION_MAJOR} LESS 6)
-  find_package(Qt5MacExtras)
-  mark_as_advanced(Qt5MacExtras_DIR)
-  list(APPEND QT_COLLIDER_LIBS Qt5::MacExtras)
-endif()
+set(QT_VERSION_MAJOR ${QT_VERSION_MAJOR} PARENT_SCOPE) # make it available elsewhere
 
 ###############################################################################
 # Debug flags
