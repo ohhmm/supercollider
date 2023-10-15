@@ -173,11 +173,6 @@ qt_add_resources( QT_COLLIDER_RCC ${QT_COLLIDER_DIR}/resources.qrc )
 
 if(APPLE)
   set( QT_COLLIDER_OBJCPP_SRCS ${QT_COLLIDER_DIR}/hacks/hacks_mac.mm )
-  if(${QT_VERSION_MAJOR} LESS 6)
-    list(APPEND QT_COLLIDER_HDRS ${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.h )
-    qt_wrap_cpp( QT_COLLIDER_OBJ_MOC_SRCS ${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.h )
-    list(APPEND QT_COLLIDER_OBJCPP_SRCS ${QT_COLLIDER_OBJ_MOC_SRCS} ${QT_COLLIDER_DIR}/widgets/QcQuartzComposerView.mm  ${QT_COLLIDER_DIR}/primitives/prim_QQuartzComposer.mm )
-  endif()
 endif()
 
 set_source_files_properties( ${QT_COLLIDER_OBJCPP_SRCS}

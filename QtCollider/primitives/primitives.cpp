@@ -38,10 +38,6 @@ void defineQWidgetPrimitives();
 void defineQPalettePrimitives();
 void defineQImagePrimitives();
 
-#if defined(__APPLE__) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-void defineQcQuartzComposerPrimitives();
-#endif
-
 void initPrimitives() {
     QtCollider::init();
 
@@ -53,10 +49,6 @@ void initPrimitives() {
     defineMiscPrimitives();
     defineQPalettePrimitives();
     defineQImagePrimitives();
-
-#if defined(__APPLE__) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    defineQcQuartzComposerPrimitives();
-#endif
 
 #define QC_DO_SYMBOL(SYM) sym_##SYM = getsym(#SYM);
     QC_DO_SYMBOLS

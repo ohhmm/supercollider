@@ -61,7 +61,6 @@ table::
 ## SoundFileView        || SCSoundFileView        || JSCSoundFileView    || QSoundFileView      || waveform view / editor for sound files
 ## MovieView            || SCMovieView            || JSCMovieView        || N/A                 || canvas for movie (QuickTime) and image display
 ## TextView             || SCTextView             || JSCTextView         || QTextView           || multiline text editor
-## N/A                  || SCQuartzComposerView   || N/A                 || N/A                 || view for displaying QuartzComposer documents
 ## N/A                  || SCImage                || N/A                 || N/A                 || an image component for the macOS
 ## N/A                  || SCImageFilter          || N/A                 || N/A                 || a filter class to use with SCImage
 ## N/A                  || SCImageKernel          || N/A                 || N/A                 || a kernel class to use with SCImage.
