@@ -114,11 +114,7 @@ Q_SIGNALS:
 private:
     Main(void);
     bool eventFilter(QObject* obj, QEvent* event);
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    bool nativeEventFilter(const QByteArray&, void* message, long*);
-#else
     bool nativeEventFilter(const QByteArray&, void* message, qintptr*);
-#endif
 
     Settings::Manager* mSettings;
     ScProcess* mScProcess;

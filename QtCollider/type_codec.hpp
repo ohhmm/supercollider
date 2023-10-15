@@ -336,19 +336,6 @@ template <typename ContainedT> struct TypeCodec<QVector<ContainedT>> {
     }
 };
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-template <typename ContainedT> struct TypeCodec<QList<ContainedT>> {
-    static QList<ContainedT> read(PyrSlot* slot) {
-        qWarning("WARNING: TypeCodec<PyrObject*>::read(PyrSlot*) = NO-OP");
-        return QList<ContainedT>();
-    }
-
-    static void write(PyrSlot* slot, const QList<ContainedT>& vec) {
-        setObjectList(slot, vec.size(), vec.begin(), vec.end());
-    }
-};
-#endif
-
 template <> struct TypeCodec<QVariantList> {
     static QVariantList read(PyrSlot* slot);
 
