@@ -25,20 +25,13 @@
 #    include "../widgets/web_page.hpp"
 #    include <QWebEnginePage>
 #    include <QWebEngineSettings>
-#    if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
-#        include <QWebEngineContextMenuData>
-#    else
-#        include <QWebEngineContextMenuRequest>
-#    endif
+#    include <QWebEngineContextMenuRequest>
 #    include <QAction>
 #    include <QMenu>
 #    include <QShortcut>
 #    include <QKeyEvent>
 #    include <QApplication>
 #    include <QStyle>
-#    if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-#        include <QWebEngineCallback>
-#    endif
 
 namespace QtCollider {
 
@@ -206,22 +199,6 @@ void WebView::onPageReload() { Q_EMIT(reloadTriggered(url())); }
 void WebView::contextMenuEvent(QContextMenuEvent* event) {
     QMenu menu;
 
-#    if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
-    const QWebEngineContextMenuData& contextData = page()->contextMenuData();
-
-    if (!contextData.linkUrl().isEmpty()) {
-        menu.addAction(pageAction(QWebEnginePage::CopyLinkToClipboard));
-        menu.addSeparator();
-    }
-
-    if (contextData.isContentEditable() || !contextData.selectedText().isEmpty()) {
-        menu.addAction(pageAction(QWebEnginePage::Copy));
-        if (contextData.isContentEditable()) {
-            menu.addAction(pageAction(QWebEnginePage::Paste));
-        }
-        menu.addSeparator();
-    }
-#    else
     auto contextData = this->lastContextMenuRequest();
 
     if (!contextData->linkUrl().isEmpty()) {
@@ -236,7 +213,6 @@ void WebView::contextMenuEvent(QContextMenuEvent* event) {
         }
         menu.addSeparator();
     }
-#    endif
 
     menu.addAction(pageAction(QWebEnginePage::Back));
     menu.addAction(pageAction(QWebEnginePage::Forward));

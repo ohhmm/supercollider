@@ -23,9 +23,6 @@
 
 #include <QtGlobal>
 #include "../QcCallback.hpp"
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-#    include <QWebEngineCallback>
-#endif
 #include <QWebEngineView>
 #include <QWebEnginePage>
 #include <QPointer>
