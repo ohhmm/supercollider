@@ -217,20 +217,6 @@ jobs:
             artifact-suffix: 'macOS-universal'
             verify-app: true
 
-          - job-name: 'x64 legacy'
-            os-version: '11'
-            xcode-version: '12.4'
-            qt-version: '5.15.2' # will use qt from aqtinstall
-            qt-modules: 'qtwebengine'
-            deployment-target: '10.13'
-            cmake-architectures: x86_64
-            use-syslibs: false
-            shared-libscsynth: false
-            build-libsndfile: true
-            system-portaudio: false
-            vcpkg-triplet: x64-osx-release-supercollider # required for build-libsndfile
-            artifact-suffix: 'macOS-x64-legacy' # set if needed - will trigger artifact upload
-
           - job-name: 'x64 use system libraries'
             os-version: '12'
             xcode-version: '13.4.1'
