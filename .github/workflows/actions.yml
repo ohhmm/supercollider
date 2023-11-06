@@ -81,30 +81,6 @@ jobs:
             shared-libscsynth: false
             artifact-suffix: 'linux-jammy-gcc12' # set if needed - will trigger artifact upload
 
-          - job-name: 'focal clang7'
-            os-version: '20.04'
-            c-compiler: 'clang-7'
-            cxx-compiler: 'clang++-7'
-            use-syslibs: false
-            shared-libscsynth: false
-            qt-version: '6.6.0'
-
-          - job-name: 'focal clang11'
-            os-version: '20.04'
-            c-compiler: 'clang-11'
-            cxx-compiler: 'clang++-11'
-            use-syslibs: false
-            shared-libscsynth: false
-            qt-version: '6.6.0'
-
-          - job-name: 'focal clang12'
-            os-version: '20.04'
-            c-compiler: 'clang-12'
-            cxx-compiler: 'clang++-12'
-            use-syslibs: false
-            shared-libscsynth: false
-            qt-version: '6.6.0'
-
           - job-name: 'jammy clang13'
             os-version: '22.04'
             c-compiler: 'clang-13'
@@ -116,6 +92,13 @@ jobs:
             os-version: '22.04'
             c-compiler: 'clang-14'
             cxx-compiler: 'clang++-14'
+            use-syslibs: false
+            shared-libscsynth: false
+
+          - job-name: 'jammy clang15'
+            os-version: '22.04'
+            c-compiler: 'clang-15'
+            cxx-compiler: 'clang++-15'
             use-syslibs: false
             shared-libscsynth: false
 
